@@ -13,11 +13,13 @@ import android.app.WallpaperManager;
 import android.graphics.BitmapFactory;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.module.LibraryGlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+// import com.bumptech.glide.load.resource.drawable.Drawable;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.transition.Transition;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.SimpleTarget;
 
@@ -90,7 +92,7 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
         rctCallback = callback;
         rctParams = params;
 
-        final SimpleTarget<byte[]> simpleTarget = this.getSimpleTarget(source,screen);
+        final SimpleTarget<Bitmap> simpleTarget = this.getSimpleTarget(source,screen);
         mCurrentActivity = getCurrentActivity();
         if(mCurrentActivity==null){
             sendMessage("error","CurrentActivity is null",source);
@@ -102,11 +104,12 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
                 public void run() {
                     ThreadUtil.assertMainThread();
                     try{
-                        Glide
+                      Glide
                             .with(mApplicationContext)
-                            .load(Base64.decode(source.replaceAll("data:image\\/.*;base64,", ""), Base64.DEFAULT))
                             .asBitmap()
-                            .toBytes()
+                            .load(Base64.decode(source.replaceAll("data:image\\/.*;base64,", ""), Base64.DEFAULT))
+                            // .asBitmap()
+                            // .toBytes()
                             .centerCrop()
                             .into(simpleTarget);
                     }catch (Exception e) {
@@ -165,11 +168,12 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
                 public void run() {
                     ThreadUtil.assertMainThread();
                     try{
-                        Glide
+                      Glide
                             .with(mApplicationContext)
-                            .load(mUri)
                             .asBitmap()
-                            .toBytes()
+                            .load(mUri)
+                            // .asBitmap()
+                            // .toBytes()
                             .centerCrop()
                             .into(simpleTarget);
                     }catch (Exception e) {
@@ -182,11 +186,12 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
                 public void run() {
                     ThreadUtil.assertMainThread();
                     try{
-                        Glide
+                      Glide
                             .with(mApplicationContext)
-                            .load(mUri)
                             .asBitmap()
-                            .toBytes()
+                            .load(mUri)
+                            // .asBitmap()
+                            // .toBytes()
                             .centerCrop()
                             .into(simpleTarget);
                     }catch (Exception e) {
@@ -210,11 +215,12 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
                 public void run() {
                     ThreadUtil.assertMainThread();
                     try{
-                        Glide
+                      Glide
                             .with(mApplicationContext)
-                            .load(new GlideUrl(mUri.toString(), lazyHeaders.build()))
                             .asBitmap()
-                            .toBytes()
+                            .load(new GlideUrl(mUri.toString(), lazyHeaders.build()))
+                            // .asBitmap()
+                            // .toBytes()
                             .centerCrop()
                             .into(simpleTarget);
                     }catch (Exception e) {
@@ -225,19 +231,19 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
         }
     }
 
-    private SimpleTarget<byte[]> getSimpleTarget(final String source, final String screen){
-        return new SimpleTarget<byte[]>(1080, 1920){
+    private SimpleTarget<Bitmap> getSimpleTarget(final String source, final String screen){
+        return new SimpleTarget<Bitmap>(1080, 1920){
             @Override
-            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(resource, 0, resource.length);
+            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> glideAnimation) {
+                // Bitmap bitmap = BitmapFactory.decodeByteArray(resource, 0, resource.length);
                 try
                 {
                     if(screen.equals("lock")){
-                        wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
+                        wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK);
                     } else if(screen.equals("home")){
-                        wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
+                        wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM);
                     } else if(screen.equals("both")){
-                        wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
+                        wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK | WallpaperManager.FLAG_SYSTEM);
                     }
                     sendMessage("success","Set Wallpaper Success",source);
                 }
@@ -248,8 +254,8 @@ public class WallPaperManager extends ReactContextBaseJavaModule {
                 }
             }
 
-            @Override
-            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+            // @Override
+            public void onLoadFailed(Exception e, Target<Drawable> errorDrawable) {
                 // Do nothing.
                 sendMessage("error","Set Wallpaper Failed："+ e.getMessage() ,source);
             }

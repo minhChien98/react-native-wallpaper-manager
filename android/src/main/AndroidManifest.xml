@@ -2,8 +2,8 @@
     package="com.ajaybhatia.reactnative.wallpaper">
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <application>
-        <meta-data
+        <!-- <meta-data
             android:name="com.ajaybhatia.reactnative.wallpaper.MyGlideModule"
-            android:value="GlideModule" />
+            android:value="GlideModule" /> -->
     </application>
 </manifest>
